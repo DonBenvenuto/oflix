@@ -1,0 +1,42 @@
+{% extends 'back/base_back.html.twig' %}
+
+{% block title %}Utilisateurs{% endblock %}
+
+{% block body %}
+
+    <h1>Utilisateurs</h1>
+
+    {{ include('_flash_messages.html.twig') }}
+
+    <a class="btn btn-success" href="{{ path('back_user_new') }}">Ajouter un utilisateur</a>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>E-mail</th>
+                <th>Roles</th>
+                <!-- <th>Poster</th> -->
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td><a href="{{ path('back_user_show', {'id': user.id}) }}">{{ user.email }}</a></td>
+                <td>{{ user.roles|join(', ') }}</td>
+                <td>
+                    <a class="btn btn-sm btn-primary" href="{{ path('back_user_show', {'id': user.id}) }}">show</a>
+                    <a class="btn btn-sm btn-success" href="{{ path('back_user_edit', {'id': user.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">Aucun enregistrement trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
