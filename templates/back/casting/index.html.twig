@@ -1,0 +1,44 @@
+{% extends 'back/base_back.html.twig' %}
+
+{% block title %}Castings{% endblock %}
+
+{% block body %}
+
+    <h1>Castings</h1>
+    <h2>{{ movie.title }}</h2>
+
+    {{ include('_flash_messages.html.twig') }}
+
+    <a class="btn btn-success" href="{{ path('back_casting_new', {id: movie.id}) }}">Ajouter un casting</a>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Acteur</th>
+                <th>Rôle</th>
+                <th>Ordre</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for casting in castings %}
+            <tr>
+                <td>{{ casting.id }}</td>
+                <td>{{ casting.person.fullname }}</td>
+                <td>{{ casting.role }}</td>
+                <td>{{ casting.creditOrder }}</td>
+                <td>
+                    {# <a class="btn btn-sm btn-primary" href="{{ path('back_casting_show', {'id': casting.id}) }}">show</a> #}
+                    <a class="btn btn-sm btn-success" href="{{ path('back_casting_edit', {'id': casting.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="10">Aucun enregistrement trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
