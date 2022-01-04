@@ -1,0 +1,10 @@
+<a href="{{ path('favorite_gestion', {id: movie.id}) }}" class="movie__favorite fs-1 my-2 mx-3 link-danger">
+    {# Si l'id du film est présent dans les favoris en session #}
+    {% if app.session.get('myFavorites')[movie.id] is defined %}
+    {# Bouton suppr. #}
+    <i class="bi bi-bookmark-x-fill"></i>
+    {% else %}
+    {# Bouton ajouter #}
+    <i class="bi bi-bookmark-plus"></i>
+    {% endif %}
+</a>
