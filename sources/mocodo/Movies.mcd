@@ -1,0 +1,11 @@
+PERSON: person code, firstname, lastname
+Belongs to, 0N MOVIE, 0N GENRE
+GENRE: genre code, name
+
+Plays, 0N PERSON, 0N MOVIE: role, credit order
+MOVIE: ISAN, title, release date, duration, summary, synopsis, poster, rating
+Has, 11 SEASON, 0N MOVIE
+
+USER: email, username, role
+Reviews, 0N USER, 0N MOVIE: content, rating, watched at
+SEASON: season code, number, episodes number

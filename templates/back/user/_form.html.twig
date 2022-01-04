@@ -1,0 +1,8 @@
+{#
+    Alternativement, on peut configurer les options du form
+    dans la méthode configureOptions() du FormType
+#}
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-success mb-3">{{ button_label|default('Enregistrer') }}</button>
+{{ form_end(form) }}
