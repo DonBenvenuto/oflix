@@ -2,15 +2,16 @@
 
 namespace App\Controller\Api;
 
-use Symfony\Component\Serializer\SerializerInterface;
-use App\Entity\Genre;
+use App\Entity\Movie;
 use App\Repository\MovieRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use App\Entity\Movie;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class MovieController extends AbstractController
 {
@@ -41,21 +42,13 @@ class MovieController extends AbstractController
     /**
      * Get one item
      * 
-     * @Route("/api/movies/{id<\d+>}", name="api_movie_get_item", methods={"GET"})
+     * @Route("/api/movies/{id<\d+>}", name="api_movies_get_item", methods={"GET"})
      */
-    public function getItem(Movie $movie): Response
+    public function getItem(Movie $movie)
     {
-        // @ todo retourner un film et ses inforamtions détaillées avec son id
+        // 404 custom à gérer
 
-        // 404 à faire
-
-        return $this->json(
-            $movie,
-            Response::HTTP_OK,
-            [],
-            ['groups' => ['get_item', 'get_collection']]
-        );
-
+        return $this->json($movie, Response::HTTP_OK, [], ['groups' => 'get_item']);
     }
 
     /**
@@ -66,6 +59,7 @@ class MovieController extends AbstractController
     public function getItemRandom(MovieRepository $movieRepository): Response
     {
         // On va chercher le film
+        // /!\ Attention film "incomplet", vient d'une requête SQL
         $randomMovie = $movieRepository->findOneRandomMovie();
 
         return $this->json(
@@ -77,48 +71,35 @@ class MovieController extends AbstractController
     }
 
     /**
-     * @Route("/api/genres/{id<\d+>}/movies", name="api_genres_get_movies", methods={"GET"})
-     */
-    public function getItemAndMovies(Genre $genre, MovieRepository $movieRepository): Response
-    {
-        $moviesList = $genre->getMovies();
-        //$moviesList = $movieRepository->findBy(['genres' => $genre]);
-
-        // Tableau PHP à convertir en JSON
-        $data = [
-            'genre' => $genre,
-            'movies' => $moviesList,
-        ];
-
-        return $this->json(
-            $data,
-            Response::HTTP_OK,
-            [],
-            [
-                'groups' => [
-                    // Le groupe des films
-                    'get_collection',
-                    // Le groupe des genres
-                    'get_genres_collection'
-                ]
-            ]
-        );
-    }
-
-     /**
      * Create movie item
      * 
      * @Route("/api/movies", name="api_movies_post", methods={"POST"})
      */
-    public function createItem(Request $request, SerializerInterface $serializer, ManagerRegistry $doctrine)
+    public function createItem(Request $request, SerializerInterface $serializer, ManagerRegistry $doctrine, ValidatorInterface $validator)
     {
         // Récupérer le contenu JSON
         $jsonContent = $request->getContent();
 
-        // Désérialiser (convertir) le JSON en entité Doctrine Movie
-        $movie = $serializer->deserialize($jsonContent, Movie::class, 'json');
+        try {
+            // Désérialiser (convertir) le JSON en entité Doctrine Movie
+            $movie = $serializer->deserialize($jsonContent, Movie::class, 'json');
+        } catch (NotEncodableValueException $e) {
+            // Si le JSON fourni est "malformé" ou manquant, on prévient le client
+            return $this->json(
+                ['error' => 'JSON invalide'],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
 
         // Valider l'entité
+        // @link : https://symfony.com/doc/current/validation.html#using-the-validator-service
+        $errors = $validator->validate($movie);
+
+        // Y'a-t-il des erreurs ?
+        if (count($errors) > 0) {
+            // @todo Retourner des erreurs de validation propres
+            return $this->json($errors, Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
 
         // On sauvegarde l'entité
         $entityManager = $doctrine->getManager();
@@ -132,14 +113,13 @@ class MovieController extends AbstractController
             // Le status code : 201 CREATED
             // utilisons les constantes de classes !
             Response::HTTP_CREATED,
-            // REST demande un header Location + URL de la ressource créée
+            // REST demande un header Location + URL de la ressource
             [
-            // Nom de l'en-tête + URL
-            'Location' => $this->generateUrl('api_movies_post', ['id' => $movie->getId()])
+                // Nom de l'en-tête + URL
+                'Location' => $this->generateUrl('api_movies_get_item', ['id' => $movie->getId()])
             ],
             // Groups
             ['groups' => 'get_item']
         );
     }
-
 }

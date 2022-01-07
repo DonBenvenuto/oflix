@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\SeasonRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=SeasonRepository::class)
@@ -19,11 +20,13 @@ class Season
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"get_collection"})
      */
     private $number;
 
     /**
      * @ORM\Column(type="smallint")
+     * @Groups({"get_collection"})
      */
     private $episodesNumber;
 
