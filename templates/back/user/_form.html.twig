@@ -3,6 +3,11 @@
     dans la méthode configureOptions() du FormType
 #}
 {{ form_start(form) }}
-    {{ form_widget(form) }}
+
+    {# On décompose si on veut ordonner les champs dans un ordre différent du form #}
+    {{ form_row(form.email) }}
+    {{ form_row(form.password) }}
+    {{ form_row(form.roles) }}
+
     <button class="btn btn-success mb-3">{{ button_label|default('Enregistrer') }}</button>
 {{ form_end(form) }}

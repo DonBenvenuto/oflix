@@ -119,6 +119,15 @@
         </div>
     </div>
 
+    
+    {# Widget "Un film au hasard"" #}
+    {% if randomMovie is defined %}
+    <div class="text-center border-top pt-3">
+        <p>Un film au hasard : <a href="{{ path('main_movie_show', {slug: randomMovie.slug}) }}">{{ randomMovie.title }}</a></p>
+    </div>
+    {% endif %}
+
+
     <!-- footer -->
     <footer class="container-fluid py-4 border-top text-center">
         <span class="text-muted">O'flix made with &hearts; at O'clock !

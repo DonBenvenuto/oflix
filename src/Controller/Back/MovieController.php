@@ -41,7 +41,7 @@ class MovieController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             // On slugifie le titre
-            $movie->setSlug($mySlugger->slugify($movie->getTitle()));
+            // => déplacé dans MovieListener
 
             $entityManager->persist($movie);
             $entityManager->flush();
@@ -84,8 +84,7 @@ class MovieController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             // On slugifie le titre
-            // /!\ SEO : cela va casser le référencement actuel...
-            // idéalement on utilisera une URL du type /{id}/{slug} comme sur le blog O'clock
+            // => déplacé dans MovieListener
             $movie->setSlug($mySlugger->slugify($movie->getTitle()));
 
             $entityManager->flush();

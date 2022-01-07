@@ -80,6 +80,31 @@ class MovieRepository extends ServiceEntityRepository
         // returns an array of Movie objects
         return $query->setMaxResults(10)->getResult();
     }
+
+
+    /**
+     * Get one random movie
+     */
+    public function findOneRandomMovie()
+    {
+        // On peut se permettre de le faire en SQL pur
+        // on va récupérer un tableau PHP ce qui est suffisant
+        // on a juste besoin du slug et du title pour générer la route
+        $dbalConnection = $this->getEntityManager()->getConnection();
+
+        // La requête SQL 
+        $sql = 'SELECT *
+            FROM `movie`
+            ORDER BY RAND()
+            LIMIT 1';
+        
+        // On execute et on fetch en tableau assoc
+        $result = $dbalConnection->executeQuery($sql)->fetchAssociative();
+        
+        
+        return $result;
+    }
+
     
     // /**
     //  * @return Movie[] Returns an array of Movie objects

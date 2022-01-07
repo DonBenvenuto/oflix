@@ -8,10 +8,15 @@ use App\Repository\MovieRepository;
 use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=MovieRepository::class)
+ * 
+ * Ecoute les événements du cycle de vie de l'entité
+ * @link https://symfony.com/doc/current/doctrine/events.html#doctrine-lifecycle-callbacks
+ * @ORM\HasLifecycleCallbacks()
  */
 class Movie
 {
@@ -19,29 +24,34 @@ class Movie
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"get_collection", "get_item"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\NotBlank
+     * @Groups({"get_collection", "get_item"})
      */
     private $title;
 
     /**
      * @ORM\Column(type="string", length=20)
      * @Assert\NotBlank
+     * @Groups({"get_collection", "get_item"})
      */
     private $type;
 
     /**
      * @ORM\Column(type="date", nullable=true)
      * @Assert\NotBlank
+     * @Groups({"get_collection", "get_item"})
      */
     private $releaseDate;
 
     /**
      * @ORM\OneToMany(targetEntity=Season::class, mappedBy="movie", cascade={"remove"})
+     * @Groups({"get_collection", "get_item"})
      */
     private $seasons;
 
@@ -50,12 +60,14 @@ class Movie
      * 
      * Si on souhaite qu'un film ait au moins 1 genre
      * @Assert\Count(min=1)
+     * @Groups({"get_collection", "get_item"})
      */
     private $genres;
 
     /**
      * @ORM\OneToMany(targetEntity=Casting::class, mappedBy="movie", orphanRemoval=true)
      * @ORM\OrderBy({"creditOrder"="ASC"})
+     * @Groups({"get_item"})
      * 
      * @link https://www.doctrine-project.org/projects/doctrine-orm/en/2.10/reference/annotations-reference.html#orderby
      */
@@ -64,40 +76,52 @@ class Movie
     /**
      * @ORM\Column(type="smallint")
      * @Assert\NotBlank
+     * @Groups({"get_collection", "get_item"})
      */
     private $duration;
 
     /**
      * @ORM\Column(type="string", length=600)
      * @Assert\NotBlank
+     * @Groups({"get_collection", "get_item"})
      */
     private $summary;
-
+    
     /**
      * @ORM\Column(type="text")
      * @Assert\NotBlank
+     * @Groups({"get_item"})
      */
     private $synopsis;
 
     /**
      * @ORM\Column(type="string", length=2048, nullable=true)
+     * @Groups({"get_collection", "get_item"})
      */
     private $poster;
 
     /**
      * @ORM\Column(type="float", nullable=true)
+     * @Groups({"get_collection", "get_item"})
      */
     private $rating;
-
+    
     /**
      * @ORM\OneToMany(targetEntity=Review::class, mappedBy="movie", cascade={"remove"})
+     * @Groups({"get_item"})
      */
     private $reviews;
 
     /**
      * @ORM\Column(type="string", length=500)
+     * @Groups({"get_collection", "get_item"})
      */
     private $slug;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $updatedAt;
 
     public function __construct()
     {
@@ -334,5 +358,27 @@ class Movie
         $this->slug = $slug;
 
         return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Mise à jour automatique de la date
+     * @ORM\PreUpdate
+     */
+    public function setUpdatedAtValue()
+    {
+        // Date courante
+        $this->updatedAt = new DateTime();
     }
 }

@@ -51,6 +51,10 @@ class MoviesSlugifyCommand extends Command
         $movies = $this->movieRepository->findAll();
         // Pour chaque film
         foreach ($movies as $movie) {
+
+            // On laisse ce code ici car on ne modifie aucune autre propriété
+            // donc le MovieListener ne s'exécutera pas
+
             // On slugifie le titre avec notre service MySlugger
             $movie->setSlug($this->mySlugger->slugify($movie->getTitle()));
         }
