@@ -20,7 +20,7 @@ class Casting
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string", length=101)
      * @Assert\NotBlank
      * @Groups({"get_movies_item"})
      */
