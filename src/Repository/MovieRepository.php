@@ -105,6 +105,23 @@ class MovieRepository extends ServiceEntityRepository
         return $result;
     }
 
+
+    /**
+     * Get one random movie (DQL)
+     */
+    public function findOneRandomMovieDql()
+    {
+        $entityManager = $this->getEntityManager();
+
+        $query = $entityManager->createQuery(
+            'SELECT m
+            FROM App\Entity\Movie m
+            ORDER BY RAND()'
+        );
+
+        return $query->setMaxResults(1)->getOneOrNullResult();
+    }
+
     
     // /**
     //  * @return Movie[] Returns an array of Movie objects

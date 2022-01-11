@@ -135,7 +135,7 @@ class MainController extends AbstractController
             $em->persist($review);
             $em->flush();
 
-            return $this->redirectToRoute('main_movie_show', ['id' => $movie->getId()]);
+            return $this->redirectToRoute('main_movie_show', ['slug' => $movie->getSlug()]);
         }
 
         return $this->renderForm('front/main/movie_review_add.html.twig', [
